@@ -1,7 +1,5 @@
 import "./userList.css";
-import { DataGrid } from "@material-ui/data-grid";
 import {
-  DeleteOutline,
   PermIdentity,
   AddCircle,
   Edit,
@@ -9,115 +7,177 @@ import {
   ArrowBack,
   CameraAlt,
 } from "@material-ui/icons";
-import { userRows } from "../../dummyData";
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState, Fragment } from "react";
 import { addStudent, getStudents } from "../../redux/apiCalls";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function UserList() {
-  const students = useSelector((state) => state.student.students);
-  console.log(students);
+  const [students, setStudents] = useState();
+  const studentsFromRedux = useSelector((state) => state.student);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (studentsFromRedux.error === "Token is invalid!") {
+      navigate("/signin");
+      // <Navigate to="/signin" state={{ from: window.location }} replace />;
+    } else {
+      setStudents(studentsFromRedux.students);
+    }
+  }, [students]);
+
   const [open, setOpen] = useState(false);
   const [fields, setFields] = useState({});
-  const navigate = useNavigate();
+
   const dispatch = useDispatch();
   useEffect(() => {
     getStudents(dispatch);
-  }, [dispatch, students]);
+  }, [dispatch]);
 
-  const handleAdd = async () => {
-    addStudent(fields, dispatch);
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    const form = new FormData();
+
+    for (const [key, value] of Object.entries(fields)) {
+      form.append(key, value);
+    }
+    addStudent(form, dispatch);
     setOpen(false);
   };
 
   function handleFields(e) {
     e.preventDefault();
+
     setFields((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.files ? e.target.files[0] : e.target.value,
     }));
   }
-
-  console.log(fields);
-
   return (
     <div className="userList">
       {open && (
-        <div className="modal">
-          <div className="modalContainer">
-            <div className="modal-header">
-              <div className="header-side-1">
-                <span
-                  onClick={() => setOpen(false)}
-                  style={{
-                    cursor: "pointer",
-                    marginRight: "7px",
-                  }}
-                >
-                  <ArrowBack />
-                </span>
-                <h3>Add Student</h3>
+        <>
+          <div className="overlay"></div>
+          <div className="modal">
+            <form
+              className="modalContainer"
+              encType="multipart/form-data"
+              onSubmit={handleAdd}
+            >
+              <div className="modal-header">
+                <div className="header-side-1">
+                  <span
+                    onClick={() => setOpen(false)}
+                    style={{
+                      cursor: "pointer",
+                      marginRight: "7px",
+                    }}
+                  >
+                    <ArrowBack />
+                  </span>
+                  <h3>Add Student</h3>
+                </div>
+                <button className="addStudent-btn" type="submit">
+                  Add
+                </button>
               </div>
-              <button className="addStudent-btn" onClick={handleAdd}>
-                Add
-              </button>
-            </div>
-            <div className="imgSelectorContainer">
-              <div className="img_selector">
-                <img src="" alt="" className="student_img" />
-                <span className="img_selector_icon_container">
-                  <CameraAlt />
-                </span>
-              </div>
-            </div>
-            <div className="fieldContainer">
-              <div className="fieldDiv">
-                <div>
-                  <label htmlFor="">First Name</label>
-                  <input type="text" name="firstname" onChange={handleFields} />
-                </div>
-                <div>
-                  <label htmlFor="">Last Name</label>
-                  <input type="text" name="lastname" onChange={handleFields} />
-                </div>
-              </div>
-              <div className="fieldDiv">
-                <div>
-                  <label htmlFor="">Course</label>
-                  <input type="text" name="course" onChange={handleFields} />
-                </div>
-                <div>
-                  <label htmlFor="">Password</label>
-                  <input type="text" name="password" onChange={handleFields} />
-                </div>
-              </div>
-              <div className="fieldDiv">
-                <div>
-                  <label htmlFor="">Email</label>
-                  <input type="text" name="email" onChange={handleFields} />
-                </div>
-                <div>
-                  <label htmlFor="">Phone Number</label>
-                  <input type="text" name="number" onChange={handleFields} />
+              <div className="imgSelectorContainer">
+                <div className="img_selector">
+                  <img
+                    src={`${
+                      fields.userimg && URL.createObjectURL(fields?.userimg)
+                    }`}
+                    alt=""
+                    className="student_img"
+                  />
+                  <label className="img_selector_icon_container" htmlFor="img">
+                    <CameraAlt />
+                    <input
+                      type="file"
+                      id="img"
+                      name="userimg"
+                      onChange={handleFields}
+                      style={{
+                        display: "none",
+                      }}
+                    />
+                  </label>
                 </div>
               </div>
-            </div>
+              <div className="fieldContainer">
+                <div className="fieldDiv">
+                  <div>
+                    <label htmlFor="">First Name</label>
+                    <input
+                      type="text"
+                      name="firstname"
+                      onChange={handleFields}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="">Last Name</label>
+                    <input
+                      type="text"
+                      name="lastname"
+                      onChange={handleFields}
+                    />
+                  </div>
+                </div>
+                <div className="fieldDiv">
+                  <div>
+                    <label htmlFor="">Course</label>
+                    <input type="text" name="course" onChange={handleFields} />
+                  </div>
+                  <div>
+                    <label htmlFor="">Password</label>
+                    <input
+                      type="text"
+                      name="password"
+                      onChange={handleFields}
+                    />
+                  </div>
+                </div>
+                <div className="fieldDiv">
+                  <div>
+                    <label htmlFor="">Email</label>
+                    <input type="text" name="email" onChange={handleFields} />
+                  </div>
+                  <div>
+                    <label htmlFor="">Phone Number</label>
+                    <input type="text" name="contact" onChange={handleFields} />
+                  </div>
+                </div>
+              </div>
+            </form>
           </div>
-        </div>
+        </>
       )}
 
       <div className="header">
         <div className="headingContainer">
           <div className="icon-div">
-            <PermIdentity color="white" />
+            <PermIdentity
+              style={{
+                color: "white",
+              }}
+            />
           </div>
           <h2 className="heading">Students</h2>
         </div>
         <div className="buttonContainer" onClick={() => setOpen(true)}>
           <button className="addButton">
-            <AddCircle />
-            <span>Add Student</span>
+            <AddCircle
+              style={{
+                color: "white",
+              }}
+            />
+            <span
+              style={{
+                color: "white",
+                fontSize: "1rem",
+              }}
+            >
+              Add Student
+            </span>
           </button>
         </div>
       </div>
@@ -132,29 +192,38 @@ export default function UserList() {
       </div>
       <div className="users">
         {students?.map((student, index) => (
-          <div key={student.id}>
+          <div
+            key={student._id}
+            style={{
+              backgroundColor: "white",
+              marginTop: "10px",
+              padding: "10px 0",
+              borderRadius: "10px",
+            }}
+          >
             <ul className="list-item-container">
-              <li className="list-item-user list-item">{index + 1}</li>
-              <li className="list-item-user list-item">
+              <li className="list-item-user">{student.rollNum}</li>
+              <li className="list-item-user">
                 <img
                   src={
-                    student.img !== ""
+                    student.img
                       ? student.img
                       : "https://www.freeiconspng.com/thumbs/profile-icon-png/profile-icon-9.png"
                   }
                   style={{
                     borderRadius: "50%",
-                    width: "50px",
-                    height: "50px",
+                    width: "40px",
+                    height: "40px",
                   }}
+                  alt="User's"
                 />
               </li>
-              <li className="list-item-user list-item">{student.firstname}</li>
-              <li className="list-item-user list-item">{student.course}</li>
-              <li className="list-item-user list-item">{student.password}</li>
+              <li className="list-item-user">{student.firstname}</li>
+              <li className="list-item-user">{student.course}</li>
+              <li className="list-item-user">{student.password}</li>
               <li
-                className="list-item-user list-item"
-                onClick={() => navigate(`/user/${student.id}`)}
+                className="list-item-user"
+                onClick={() => navigate(`/user/${student._id}`)}
                 style={{
                   cursor: "pointer",
                 }}

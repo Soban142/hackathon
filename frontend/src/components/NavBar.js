@@ -156,31 +156,20 @@ const Auth = styled.button`
 
 // Navbar component
 const Navbar = () => {
-  // const user = useSelector((state) => state.user.currentUser)
+  const user = useSelector((state) => state.user.currentUser);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = {
-    img: "cool",
-  };
+  // const user = {
+  //   img: "cool",
+  // };
   return (
     <NavbarContainer>
       <Wrapper>
         <LogoAndSearch>
-          <Logo>MyLogo</Logo>
-          <Search>
-            <div>
-              <SearchInput type="text" placeholder="Search" />
-            </div>
-            <SearchIconDiv>
-              <SearchIcon />
-            </SearchIconDiv>
-          </Search>
+          <Logo>Hello {user.firstname}</Logo>
         </LogoAndSearch>
         <NavList>
-          <NavItem>Home</NavItem>
-          <NavItem>About</NavItem>
-          <NavItem>Contact</NavItem>
           <NavItem>
             {user ? (
               <User>

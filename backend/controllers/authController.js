@@ -1,11 +1,12 @@
 import User from "../model/User.js";
-import bcrypt from "bcrypt";
+
 import { createError } from "../middlewares/error.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import Student from "../model/Student.js";
 dotenv.config();
 
-const signup = async (req, res, next) => {
+const adminSignup = async (req, res, next) => {
   console.log(req.body);
 
   if (
@@ -109,35 +110,39 @@ const signin = async (req, res, next) => {
   //   }
 };
 
-// const googleAuth = async (req, res, next) => {
-//   try {
-//     const user = await User.findOne({ email: req.body.email });
-//     if (user) {
-//       const token = jwt.sign({ id: user._id }, process.env.JWT);
-//       res
-//         .cookie("access_token", token, {
-//           httpOnly: true,
-//         })
-//         .status(200)
-//         .json(user._doc);
-//     } else {
-//       const newUser = new User({
-//         ...req.body,
-//         fromGoogle: true,
-//       });
+const studentSignin = async (req, res, next) => {
+  console.log(req.body);
+  const emailOrUsername = req.body?.username || req.body?.email;
+  try {
+    const foundStudent = await Student.findOne({
+      $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
+    });
+    console.log(foundStudent);
+    if (!foundStudent) return res.status(404).json("User not found");
 
-//       const savedUser = newUser.save();
-//       const token = jwt.sign({ id: savedUser._id }, process.env.JWT);
-//       res
-//         .cookie("access_token", token, {
-//           httpOnly: true,
-//         })
-//         .status(200)
-//         .json(savedUser._doc);
-//     }
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    // const matchedPassword = await bcrypt.compare(
+    //   req.body?.password,
+    //   foundUser.password
+    // );
 
-export { signup, signin };
+    // if (matchedPassword) return res.status(401).json("Authorization failed");
+    if (foundStudent.password !== req.body.password)
+      return res.status(401).json("Authorization failed");
+
+    const accessToken = jwt.sign(
+      {
+        id: foundStudent._id,
+      },
+      process.env.TOKEN_SECRET,
+      { expiresIn: "3d" }
+    );
+
+    const { password, ...others } = foundStudent._doc;
+
+    res.status(200).json({ ...others, accessToken });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { adminSignup, signin, studentSignin };

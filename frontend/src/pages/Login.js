@@ -114,7 +114,7 @@ const Login = () => {
     e.preventDefault();
     dispatch(loginStart());
     try {
-      const user = await request.post("/auth/signin", {
+      const user = await request.post("/auth/studentSignin", {
         email,
         password,
       });
@@ -143,7 +143,7 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
             <TextInput
-              type="text"
+              type="password"
               placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
             />

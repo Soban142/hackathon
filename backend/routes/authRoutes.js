@@ -1,12 +1,16 @@
 import express from "express";
-import { signup, signin } from "../controllers/authController.js";
+import {
+  adminSignup,
+  signin,
+  studentSignin,
+} from "../controllers/authController.js";
 
 const authRouter = express.Router();
 
-authRouter.route("/signup").post(signup);
+authRouter.post("/adminSignup", adminSignup);
 
 authRouter.route("/signin").post(signin);
 
-// authRouter.post("/google", googleAuth);
+authRouter.post("/studentSignin", studentSignin);
 
 export default authRouter;

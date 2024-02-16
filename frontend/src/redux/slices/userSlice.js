@@ -26,18 +26,6 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = false;
     },
-    // subscription: (state, action) => {
-    //   if (state.currentUser.subscriptions.includes(action.payload)) {
-    //     state.currentUser.subscriptions.splice(
-    //       state.currentUser.subscriptions.findIndex(
-    //         (channelId) => channelId === action.payload
-    //       ),
-    //       1
-    //     );
-    //   } else {
-    //     state.currentUser.subscriptions.push(action.payload);
-    //   }
-    // },
   },
 });
 

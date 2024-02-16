@@ -1,18 +1,23 @@
 import express from "express";
+// import {
+//   updateUser,
+//   deleteUser,
+//   getUser,
+// } from "../controllers/studentController.js";
+// import User from "../model/User.js";
+import { verifyToken, verifyTokenAndAdmin } from "../middlewares/verifyJWT.js";
 import {
-  updateUser,
-  deleteUser,
-  getUser,
-} from "../controllers/userController.js";
-import User from "../model/User.js";
-import {
-  verifyToken,
-} from "../middlewares/verifyJWT.js";
+  checkIn,
+  checkOut,
+  getAllAttendances,
+  getAttendance,
+} from "../controllers/attendanceController.js";
 
-const userRouter = express.Router();
+const attendanceRouter = express.Router();
 
-userRouter.put("/:id", verifyToken, updateUser);
+attendanceRouter.post("/checkin", checkIn);
+attendanceRouter.put("/checkout", checkOut);
+attendanceRouter.get("/find/:id", verifyTokenAndAdmin, getAttendance);
+attendanceRouter.get("/", verifyTokenAndAdmin, getAllAttendances);
 
-//DELETE
-// userRouter.delete("/:id", verifyTokenAndAuthorization, deleteUser);
-userRouter.delete("/:id", verifyToken, deleteUser);
+export default attendanceRouter;

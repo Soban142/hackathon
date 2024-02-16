@@ -16,9 +16,9 @@ const studentSlice = createSlice({
       state.isFetching = false;
       state.students = action.payload;
     },
-    getStudentsFailure: (state) => {
+    getStudentsFailure: (state, action) => {
       state.isFetching = false;
-      state.error = true;
+      state.error = action.payload;
     },
     updateStudentStart: (state) => {
       state.isFetching = true;
@@ -28,11 +28,11 @@ const studentSlice = createSlice({
       state.isFetching = false;
       state.students[
         state.students.findIndex((item) => item._id === action.payload.id)
-      ] = action.payload.product;
+      ] = action.payload.student;
     },
-    updateProductFailure: (state) => {
+    updateStudentFailure: (state, action) => {
       state.isFetching = false;
-      state.error = true;
+      state.error = action.payload;
     },
     addStudentStart: (state) => {
       state.isFetching = true;
@@ -42,9 +42,9 @@ const studentSlice = createSlice({
       state.isFetching = false;
       state.students.push(action.payload);
     },
-    addStudentFailure: (state) => {
+    addStudentFailure: (state, action) => {
       state.isFetching = false;
-      state.error = true;
+      state.error = action.payload;
     },
   },
 });
@@ -56,6 +56,9 @@ export const {
   addStudentStart,
   addStudentSuccess,
   addStudentFailure,
+  updateStudentStart,
+  updateStudentSuccess,
+  updateStudentFailure,
 } = studentSlice.actions;
 
 export default studentSlice.reducer;
